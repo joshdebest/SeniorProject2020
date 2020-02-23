@@ -20,8 +20,8 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // subroutes
-app.use('/Usr', require('.Routes/User.js'));
-app.use('/Ssns', require('.Routes/Sesh.js'));
+app.use('/Usr', require('./Routes/User.js'));
+app.use('/Ssns', require('./Routes/Sesh.js'));
 
 
 // Set up Session 
@@ -83,5 +83,16 @@ app.use(function(req, res, next){
 app.use(function(err, req, res, next){
     res.status(err.status || 500).json(err);
 });
+
+var port;
+ if (process.argv.length > 2) {
+    if (process.argv[2] === "-p") {
+       port = process.argv[3];
+    }
+ }
+ 
+ app.listen(port, function() {
+    console.log('App Listening on port ' + port);
+ });
 
 module.exports = app;

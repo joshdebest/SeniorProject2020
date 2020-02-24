@@ -20,7 +20,7 @@
     "mysql": "^2.11.1"
   },
   "scripts": {
-    "test": "node app.js -p 3000",
+    "test": "node app.js -p 3001",
     "start": "node ./bin/www"
   }
 }

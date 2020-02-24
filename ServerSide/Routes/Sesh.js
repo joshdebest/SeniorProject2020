@@ -1,8 +1,10 @@
 var express = require('express');
 var async = require('async');
-var tags = require('./Validate.js').Tags;
+var tags = require('./Validate.js').tags;
 var {Session, router} = require('./Session.js');
 var router = express.Router({caseSensitive: true});
+
+router.baseURL = '/Ssns';
 
 // get an array of active sessions, must be an admin
 router.get('/', function(req, res){
@@ -33,13 +35,14 @@ router.get('/:id', function(req, res){
 });
 
 // create a new session
-router.post('/', function(req, res){
+router.post('/login', function(req, res){
     var sesh;
-    req.cnn.checkQuery('SELECT * from User where email = ?', req.body.email,
-        function(result, err){
-            if(req.validate.check(result.length && result[0].password === req.body.password, tags.failedLogin)){
+    req.cnn.checkQuery('SELECT * from User where email = ?', [req.body.email],
+        function(err, result){
+            if(req.validate.errorCheck(result && result.length && result[0].password === req.body.password, tags.failedLogin)){
                 sesh = new Session(result[0], res);
-                res.status(200).end();
+                console.log("made it to login");
+                res.location(router.baseURL + '/' + sesh.id).status(200).end();
             }
             req.cnn.release();
         });
@@ -52,7 +55,7 @@ router.delete('/:id', function(req, res){
 
     async.waterfall([
         function(cb){
-            if(vld.checkUsr(parseInt(currSsn.usrID), cb) && vld.check(currSsn, tags.sessionNotFound, undefined, cb)){
+            if(vld.checkUsr(parseInt(currSsn.usrID), cb) && vld.errorCheck(currSsn, tags.sessionNotFound, undefined, cb)){
                 currSsn.logout();
                 cb();
             }

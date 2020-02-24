@@ -28,8 +28,10 @@ Validate.prototype.errorCheck = function(checking, tag, params, cb){
         if(this.res){
             if (this.errors[0].tag === Validate.tags.permissionError)
                 this.res.status(403).end();
-            else
+            else{
+                console.log("errorcheck");
                 this.res.status(400).end();
+            }
             this.res = null;
         }
         if (cb)
@@ -48,5 +50,10 @@ Validate.prototype.checkUsr = function(usrID, cb){
     return this.errorCheck(this.session && (this.session.checkAdmin || usrID === this.session.usrID),
                             Validate.tags.permissionError, null, cb);
 };
+
+Validate.prototype.checkAdmin = function(cb) {
+    return this.errorCheck(this.session && this.session.checkAdmin(),
+     Validate.tags.permissionError, null, cb);
+ };
 
 module.exports = Validate;

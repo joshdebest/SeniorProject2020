@@ -8,6 +8,8 @@ var Session = function(user, res){
     var token = crypto.randomBytes(32).toString('hex');
     res.cookie(name, token, {maxDuration : ssnDuration, httpOnly : true});
     sessionByCookie[token] = this;
+    sessionArray.push(this);
+    //this.cookie = token;
     this.id = sessionArray.length - 1;
     this.loginTime = new Date().getTime();
     this.authToken = token;
@@ -40,7 +42,7 @@ var router = function(req, res, next){
     var cookie = req.cookies[name];
     var currSession = cookie && sessionByCookie[cookie];
     if (currSession){
-        if (currSession.loginTime < new Date().getTime() - maxDuration)
+        if (currSession.loginTime < new Date().getTime() - ssnDuration)
             currSession.logout;
         else
             req.session = currSession;

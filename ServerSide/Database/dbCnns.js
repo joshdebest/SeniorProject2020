@@ -3,9 +3,10 @@ var mysql = require('mysql');
 // Holds the connection pool
 var dbCnns = function(){
     var config = require('./connection.json');
-
+    config.connectionLimit = dbCnns.PoolSize;
     this.pool = mysql.createPool(config);
 };
+dbCnns.PoolSize = 1;
 
 dbCnns.singleton = new dbCnns();
 
@@ -15,12 +16,13 @@ dbCnns.prototype.getConnection = function(cb){
 
 // creates the connection
 dbCnns.router = function(req, res, next){
-    dbCnns.singleton.getConnection(function(err, connection){
+    console.log("getting connection");
+    dbCnns.singleton.getConnection(function(err, cnn){
         if (err)
             res.status(500).json('Failed to connect to database' + err);
         else {
             console.log("Successful DB connection");
-            connection.checkQuery = function(testQuery, params, cb){
+            cnn.checkQuery = function(testQuery, params, cb){
                 this.query(testQuery, params, function(err, result, fields){
                     if(err)
                         res.status(500).json('Failed query' + testQuery);

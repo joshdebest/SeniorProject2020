@@ -10,5 +10,5 @@ create table User (
 );
 
 
-insert into User (email, firstName, lastName, password, role, grade)
-            VALUES ("jdebest@email.com”, “Josh”, “DeBest”, “password”, 2, null);
+insert into User (email, firstName, lastName, password, role, grade) 
+   VALUES ("jdebest@email.com", "Josh", "DeBest", "password", 2, null);

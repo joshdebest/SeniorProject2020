@@ -10,6 +10,7 @@ Validate.tags = {
     missingField : "missingField",              // Field missing from request. Params[0] gives field name
     badValue : "badValue",                      // Field has bad value. Params[0] gives field name
     userNotFound : "userNotFound",              // User not present in DB, occurs when the User doesn’t exist
+    sessionNotFound : "sessionNotFound",
     permissionError : "permissionError",
     failedLogin : "failedLogin",                // Email and password combination invalid
     duplicateEmail : "duplicateEmail",          // Duplicate email provided

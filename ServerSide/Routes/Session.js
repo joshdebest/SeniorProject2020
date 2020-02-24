@@ -2,11 +2,13 @@ var crypto = require('crypto');
 var ssnDuration = 108000000;  // 3 hour duration
 var name = 'debestAuth';
 var sessionByCookie = {}; // All current sessions, user is logged in
+var sessionArray = [];
 
 var Session = function(user, res){
     var token = crypto.randomBytes(32).toString('hex');
     res.cookie(name, token, {maxDuration : ssnDuration, httpOnly : true});
     sessionByCookie[token] = this;
+    this.id = sessionArray.length - 1;
     this.loginTime = new Date().getTime();
     this.authToken = token;
     this.usrID = user.id;
@@ -22,6 +24,14 @@ Session.prototype.checkAdmin = function(){
 }
 Session.prototype.logout = function(){
     delete sessionByCookie[this.authToken];
+}
+
+Session.findSession = function(id){
+    return sessionArray[id];
+}
+
+Session.getIDs = function(){
+    return Object.keys(sessionArray);
 }
 
 // find any Session based on cookie

@@ -1,13 +1,13 @@
 var mysql = require('mysql');
 
-// Holds the connection pool
+// dbCnns is an object that holds the pool of database connections
 var dbCnns = function(){
     var config = require('./connection.json');
-    config.connectionLimit = dbCnns.PoolSize;
+    config.connectionLimit = 15;  // ??
     this.pool = mysql.createPool(config);
 };
-dbCnns.PoolSize = 1;
 
+// Creating one dbCnns object for the app
 dbCnns.singleton = new dbCnns();
 
 dbCnns.prototype.getConnection = function(cb){

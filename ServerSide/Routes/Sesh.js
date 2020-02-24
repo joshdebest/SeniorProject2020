@@ -3,7 +3,6 @@ var async = require('async');
 var tags = require('./Validate.js').tags;
 var {Session, router} = require('./Session.js');
 var router = express.Router({caseSensitive: true});
-
 router.baseURL = '/Ssns';
 
 // get an array of active sessions, must be an admin
@@ -42,7 +41,7 @@ router.post('/login', function(req, res){
             if(req.validate.errorCheck(result && result.length && result[0].password === req.body.password, tags.failedLogin)){
                 sesh = new Session(result[0], res);
                 console.log("made it to login");
-                res.location(router.baseURL + '/' + sesh.id).status(200).end();
+                res.location(router.baseURL + '/login').status(200).end();
             }
             req.cnn.release();
         });

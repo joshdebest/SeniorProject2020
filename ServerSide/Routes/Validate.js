@@ -40,6 +40,7 @@ Validate.prototype.errorCheck = function(checking, tag, params, cb){
     return (this.errors.length  === 0);
 };
 
+// used for chain checking
 Validate.prototype.chain = function(checking, tag, params){
     if (!checking)
         this.errors.push({tag : tag, params : params});
@@ -47,7 +48,7 @@ Validate.prototype.chain = function(checking, tag, params){
 }
 
 Validate.prototype.checkUsr = function(usrID, cb){
-    return this.errorCheck(this.session && (this.session.checkAdmin || usrID === this.session.usrID),
+    return this.errorCheck(this.session && (this.session.checkAdmin() || usrID === this.session.usrID),
                             Validate.tags.permissionError, null, cb);
 };
 

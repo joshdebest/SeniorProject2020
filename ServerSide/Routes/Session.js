@@ -40,8 +40,9 @@ Session.getIDs = function(){
 // if session timed out delete session, or attach Session to the req
 var router = function(req, res, next){
     var cookie = req.cookies[name];
-    var currSession = cookie && sessionByCookie[cookie];
+    var currSession = sessionByCookie[cookie];
     if (currSession){
+        // check for session timeout
         if (currSession.loginTime < new Date().getTime() - ssnDuration)
             currSession.logout;
         else

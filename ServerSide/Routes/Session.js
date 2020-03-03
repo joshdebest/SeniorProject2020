@@ -5,11 +5,12 @@ var sessionByCookie = {}; // All current sessions, user is logged in
 var sessionArray = [];
 
 var Session = function(user, res){
-    var token = crypto.randomBytes(32).toString('hex');
+    var token = crypto.randomBytes(16).toString('hex');
     res.cookie(name, token, {maxDuration : ssnDuration, httpOnly : true});
+    //res.cookie(token);
     sessionByCookie[token] = this;
     sessionArray.push(this);
-    //this.cookie = token;
+    this.cookie = token;
     this.id = sessionArray.length - 1;
     this.loginTime = new Date().getTime();
     this.authToken = token;
@@ -25,11 +26,12 @@ Session.prototype.checkAdmin = function(){
     return this.role === 2;
 }
 Session.prototype.logout = function(){
+    delete sessionArray[this.id];
     delete sessionByCookie[this.authToken];
 }
 
-Session.findSession = function(id){
-    return sessionArray[id];
+Session.findSession = function(token){
+    return sessionByCookie[token];
 }
 
 Session.getIDs = function(){

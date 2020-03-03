@@ -13,10 +13,15 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-/*app.use(function(req, res, next) {
-    console.log("Handling " + req.path + '/' + req.method);
+app.use(function(req, res, next) {
+    console.log("Handling " + req.method + '/' + req.path);
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, OPTIONS, GET");
+    res.header("Access-Control-Expose-Headers", "Location");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
     next();
- });*/
+ });
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -28,10 +33,15 @@ app.use(Session.router);
 // If login is good add a Validator, or send 401 back
 app.use(function(req, res, next){
     console.log(req.path);
-    if(req.session || (req.method === 'POST' && (req.path === '/Usr' || req.path === '/Ssns/login'))){
+    if(req.session || (req.method === 'POST' &&  
+      (req.path === '/Ssns/login' || req.path === '/Usr/signup'))){
         req.validate = new Validate(req, res);
         next();
     }
+ /*   else if (req.method === 'POST' && req.path === '/Usr/signup'){
+        req.validate = new Validate(req, res);
+        next();
+    }*/
     else
         res.status(401).end();
 });
@@ -47,12 +57,13 @@ app.use('/Ssns', require('./Routes/Sesh.js'));
 // and reinserts a single admin user
 app.delete('/DB', function(req, res){
     console.log("HELLO");
-    req.cnn.query('delete from User');
-    req.cnn.query('alter table User auto_increment = 1');
+    req.cnn.query('delete from User;');
+    req.cnn.query('alter table User auto_increment = 1;');
     req.cnn.query('insert into User (email, firstName, lastName, password, role, grade) VALUES ("jdebest@email.com", "Josh", "DeBest", "password", 2, null);');
     console.log("aaaaaa");
     res.status(200).end();
 
+    
 });
 
 app.use(function(req, res, next){

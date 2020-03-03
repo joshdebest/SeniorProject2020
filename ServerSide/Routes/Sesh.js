@@ -23,6 +23,7 @@ router.get('/', function(req, res){
     } 
 });
 
+
 // gets a specific session
 router.get('/:id', function(req, res){
     var currSsn = Session.findSession(req.params.id);
@@ -48,13 +49,14 @@ router.post('/login', function(req, res){
 });
 
 // delete a session (id), logout
-router.delete('/:id', function(req, res){
-    var currSsn = Session.findSession(req.params.id);
+router.delete('/:cookie', function(req, res){
+    var currSsn = Session.findSession(req.params.cookie);
+    if (currSsn === null) console.log("currSsn");
     var vld = req.validate;
 
     async.waterfall([
         function(cb){
-            if(vld.checkUsr(parseInt(currSsn.usrID), cb) && vld.errorCheck(currSsn, tags.sessionNotFound, undefined, cb)){
+            if (currSsn.usrID === vld.session.usrID){                
                 currSsn.logout();
                 cb();
             }

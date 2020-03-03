@@ -18,14 +18,15 @@ dbCnns.prototype.getConnection = function(cb){
 dbCnns.router = function(req, res, next){
     console.log("getting connection");
     dbCnns.singleton.getConnection(function(err, cnn){
-        if (err)
+        if (err){
             res.status(500).json('Failed to connect to database' + err);
+        }
         else {
             console.log("Successful DB connection");
             cnn.checkQuery = function(testQuery, params, cb){
                 this.query(testQuery, params, function(err, result, fields){
                     if(err)
-                        res.status(500).json('Failed query' + testQuery);
+                        res.status(500).json('Failed query ' + testQuery);
                     cb(err, result, fields);
                 });
             };

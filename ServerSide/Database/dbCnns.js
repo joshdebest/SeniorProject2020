@@ -27,6 +27,7 @@ dbCnns.router = function(req, res, next){
                 this.query(testQuery, params, function(err, result, fields){
                     if(err)
                         res.status(500).json('Failed query ' + testQuery);
+                    console.log("PLS");
                     cb(err, result, fields);
                 });
             };

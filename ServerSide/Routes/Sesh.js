@@ -41,7 +41,6 @@ router.post('/login', function(req, res){
         function(err, result){
             if(req.validate.errorCheck(result && result.length && result[0].password === req.body.password, tags.failedLogin)){
                 sesh = new Session(result[0], res);
-                console.log("made it to login");
                 res.location(router.baseURL + '/login').status(200).end();
             }
             req.cnn.release();

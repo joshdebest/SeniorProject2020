@@ -42,13 +42,13 @@ Session.getIDs = function(){
 // if session timed out delete session, or attach Session to the req
 var router = function(req, res, next){
     var cookie = req.cookies[name];
-    var currSession = sessionByCookie[cookie];
-    if (currSession){
+    var session = cookie && sessionByCookie[cookie];
+    if (session){
         // check for session timeout
-        if (currSession.loginTime < new Date().getTime() - ssnDuration)
-            currSession.logout;
+        if (session.loginTime < new Date().getTime() - ssnDuration)
+            session.logout;
         else
-            req.session = currSession;
+            req.session = session;
     }
     next();
 };

@@ -24,7 +24,7 @@ Validate.tags = {
 Validate.prototype.errorCheck = function(checking, tag, params, cb){
     if (!checking)
         this.errors.push({tag : tag, params : params});
-    if (this.errors.length > 0){
+    if (this.errors.length ){
         if(this.res){
             if (this.errors[0].tag === Validate.tags.permissionError)
                 this.res.status(403).end();
@@ -37,7 +37,7 @@ Validate.prototype.errorCheck = function(checking, tag, params, cb){
         if (cb)
             cb(this);
     }
-    return (this.errors.length  === 0);
+    return !this.errors.length;
 };
 
 // used for chain checking
@@ -47,8 +47,8 @@ Validate.prototype.chain = function(checking, tag, params){
     return this;
 }
 
-Validate.prototype.checkUsr = function(usrID, cb){
-    return this.errorCheck(this.session && (this.session.checkAdmin() || usrID === this.session.usrID),
+Validate.prototype.checkUsr = function(email, cb){
+    return this.errorCheck(this.session && (this.session.checkAdmin() || email === this.session.email),
                             Validate.tags.permissionError, null, cb);
 };
 

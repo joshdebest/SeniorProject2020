@@ -38,10 +38,6 @@ app.use(function(req, res, next){
         req.validate = new Validate(req, res);
         next();
     }
- /*   else if (req.method === 'POST' && req.path === '/Usr/signup'){
-        req.validate = new Validate(req, res);
-        next();
-    }*/
     else
         res.status(401).end();
 });
@@ -61,9 +57,47 @@ app.delete('/DB', function(req, res){
     req.cnn.query('alter table User auto_increment = 1;');
     req.cnn.query('insert into User (email, firstName, lastName, password, role, grade) VALUES ("jdebest@email.com", "Josh", "DeBest", "password", 2, null);');
     console.log("aaaaaa");
-    res.status(200).end();
+    for (var session in Session.sessions)
+        delete Session.sessions[session];
 
-    
+    res.status(200).end();
+    req.cnn.release();
+
+     /*var tables = ["User"].map(function(tableName){
+        return function(cb){
+            req.cnn.query("delete from" + tableName, null, cb);
+        };
+    });
+    tables.push(function(cb){
+        req.cnn.query("alter table User auto_increment = 1", null, cb);
+    });
+    //add admin user after tables are cleared
+    tables.push(function(cb){
+        req.cnn.query("INSERT INTO User (email, firstName, lastName, password, role, grade)" +
+        'VALUES ("jdebest@email.com”, “Josh”, “DeBest”, “password”, 2, null);', null, cb);
+    });
+
+
+    // delete all sessions
+    tables.push(function(cb){
+        Session.getIDs().forEach(id => {
+            Session.findSession(id).logout();
+        });
+        cb();
+    });
+
+    if (req.validate.checkAdmin()){
+        console.log("checkadmin");
+        async.series(cbs, function(err){
+            if(err)
+                res.status(400).json(err);
+            else 
+                res.status(200).end();
+        });
+    }    
+    else{
+        req.cnn.release();
+    }*/
 });
 
 app.use(function(req, res, next){

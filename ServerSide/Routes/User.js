@@ -16,11 +16,17 @@ router.post('/signup', function(req, res){
            .chain(body.lastName !== "", tags.missingField, ["lastName"])
            .chain(body.password !== "", tags.missingField, ["password"])
            .chain(body.role !== "", tags.missingField, ["role"])
-           .chain(body.grade !== "", tags.missingField, ["grade"])){
+           .chain(body.grade !== null && (body.role !== 1 || body.role !== 2), tags.missingField, ["grade"])
+           .chain(body.grade !== "" && (body.role !== 1 || body.role !== 2), tags.missingField, ["grade"])){
                 req.cnn.query('SELECT * from User where email = ?', body.email, (err, dupUser) => {
                     if (dupUser.length > 0){
-                        vld.errors.push({tag : tags.dupRegistration, params : null});
+                        vld.errors.push({tag : tags.duplicateEmail, params : null});
                         vld.res.status(400).json(vld.errors);
+                    }
+                    // if a user is logged in and tries to make another account
+                    else if(req.session){
+                        vld.errors.push({tag : tags.prohibitedRegister, params : null});
+                        vld.res.status(401).json(vld.errors);
                     }
                     else {
                         req.cnn.query('insert into User set ?', req.body, (err, result) => {
@@ -34,76 +40,43 @@ router.post('/signup', function(req, res){
     }
 });
 
-/*    async.waterfall([
-        function(cb){
-            // make sure all fields are filled in
-            if (vld.chain(body.email !== "", tags.missingField, ["email"])
-                    .chain(body.firstName !== "", tags.missingField, ["firstName"])
-                    .chain(body.lastName !== "", tags.missingField, ["lastName"])
-                    .chain(body.password !== "", tags.missingField, ["password"])
-                    .chain(body.role !== "", tags.missingField, ["role"])
-                    .chain(body.grade !== "", tags.missingField, ["grade"])){
-                req.cnn.query('SELECT * from User where email = ?', body.email, cb)
-            }
-        },
-        function(dupUser, fields, cb){
-         //   if (validate.errorCheck(body.role === 0 || body.role === 1, tags.permissionError, undefined, cb) &&
-           //     validate.errorCheck(!dupUser.length, tags.duplicateEmail, null, cb)){
-            console.log("pls");
-            req.cnn.query('insert into User set ?', req.body, cb);
-            console.log("nooooo");
+router.put('/', function(req, res){
+    console.log("Hello");
 
-              //      'insert into User (email, firstName, lastName, password, role, grade)'+
-              //      'VALUES (" jdebest@email.com ", "Josh", "DeBest", "password", 2, null);
-
-               // }
-        }],
-        function(result, fields, cb){
-            console.log("test");
-            res.location(router.baseURL + '/signup').end();
-            cb();
-        }],
-        function(err){
-            console.log("hellur");
-            req.cnn.release();
-        });
-});*/
-
-router.put('/:usrID', function(req, res){
     var body = req.body;
     var validate = req.validate;
     var sesh = req.session;
+    var email = req.query.email;
 
-    async.waterfall([
-        function(cb){
-            if (validate.checkUsr(parseInt(req.params.usrID), cb)){
-                if(validate.errorCheck( !("password" in req.body) || body.password !== null
-                   && body.password !== "", tags.badValue, ["password"], cb)
-                   
-                   .errorCheck(!("password" in req.body) || (("password" in req.body) && 
-                    ("oldPassword" in req.body) && (req.body.oldPassword !== "")) || 
-                    ssn.checkAdmin(), Tags.noOldPassword, null, cb)) {
-                        req.cnn.checkQuery('SELECT * from User where id = ?', req.params.usrID, cb);
-                    }
+    if (!("password" in req.body) || body.password === ""){
+        validate.errors.push({tag : tags.badValue, params : "password"});
+        validate.res.status(400).json(validate.errors);    
+    }
+    else if (!(req.body.oldPassword) || req.body.oldPassword === ""){
+        validate.errors.push({tag : tags.noOldPassword, params : "old password"});
+        validate.res.status(400).json(validate.errors); 
+    }
+    else{
+        req.cnn.query('SELECT * from User where email = ?', email, (err, result) => {
+            if(err) throw err;
+            //if((body.password && result[0].password !== body.oldPassword) || (body.password && !(sesh.checkAdmin()))){
+            //if(result[0].password !== body.oldPassword || body.password && !(sesh.checkAdmin())){
+            if(result[0].password !== body.oldPassword){
+                validate.errors.push({tag : tags.oldPwdIncorrect, params : result[0].password});
+                validate.res.status(400).json(validate.errors); 
             }
-        },
-        function(result, cb){
-            if (validate.errorCheck(body.password && result[0].password === body.oldPassword
-                || body.password && sesh.checkAdmin() || !body.password, tags.oldPwdIncorrect, null, cb)){
-
-                    delete body.oldPassword;
-                    req.cnn.checkQuery('UPDATE User set ? where id = ?', [req.body, req.params.usrID], cb);
-                }
-        },
-        function(cb){
-            cb();
-        }],
-        function(err){
-            req.cnn.release();
-            if (!err)
-                res.status(200).end();
+            else{
+                req.cnn.query('UPDATE User set ? where email = ?', [req.body, email], (err, updated) => {
+                   // req.cnn.release();
+                    if (!err)
+                        res.status(200).end();
+                });
+            }
         });
+    }
+    req.cnn.release();
 });
+
 
 router.get('/', function(req, res){
     var email = req.body.email;

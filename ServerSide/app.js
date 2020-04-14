@@ -52,52 +52,22 @@ app.use('/Ssns', require('./Routes/Sesh.js'));
 // debugging route used for database DELETE, clears all the tables 
 // and reinserts a single admin user
 app.delete('/DB', function(req, res){
-    console.log("HELLO");
     req.cnn.query('delete from User;');
     req.cnn.query('alter table User auto_increment = 1;');
     req.cnn.query('insert into User (email, firstName, lastName, password, role, grade) VALUES ("jdebest@email.com", "Josh", "DeBest", "password", 2, null);');
-    console.log("aaaaaa");
-    for (var session in Session.sessions)
-        delete Session.sessions[session];
 
+   /* ids = Session.getIDs;
+    console.log(Session.session);
+    for (i = 0; ids.length; i++){
+        Session.findSession(i).logOut();
+    }
+
+    Session.getIDs().forEach(id => {
+        Session.findSession(id).logOut();
+    });*/
+    req.session.logout();
     res.status(200).end();
     req.cnn.release();
-
-     /*var tables = ["User"].map(function(tableName){
-        return function(cb){
-            req.cnn.query("delete from" + tableName, null, cb);
-        };
-    });
-    tables.push(function(cb){
-        req.cnn.query("alter table User auto_increment = 1", null, cb);
-    });
-    //add admin user after tables are cleared
-    tables.push(function(cb){
-        req.cnn.query("INSERT INTO User (email, firstName, lastName, password, role, grade)" +
-        'VALUES ("jdebest@email.com”, “Josh”, “DeBest”, “password”, 2, null);', null, cb);
-    });
-
-
-    // delete all sessions
-    tables.push(function(cb){
-        Session.getIDs().forEach(id => {
-            Session.findSession(id).logout();
-        });
-        cb();
-    });
-
-    if (req.validate.checkAdmin()){
-        console.log("checkadmin");
-        async.series(cbs, function(err){
-            if(err)
-                res.status(400).json(err);
-            else 
-                res.status(200).end();
-        });
-    }    
-    else{
-        req.cnn.release();
-    }*/
 });
 
 app.use(function(req, res, next){

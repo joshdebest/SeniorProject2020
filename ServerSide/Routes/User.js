@@ -11,33 +11,37 @@ router.post('/signup', function(req, res){
     var sesh;
     //body.signupTime = new Date();
 
-    if (vld.chain(body.email !== "", tags.missingField, ["email"])
-           .chain(body.firstName !== "", tags.missingField, ["firstName"])
-           .chain(body.lastName !== "", tags.missingField, ["lastName"])
-           .chain(body.password !== "", tags.missingField, ["password"])
-           .chain(body.role !== "", tags.missingField, ["role"])
-           .chain(body.grade !== null && (body.role !== 1 || body.role !== 2), tags.missingField, ["grade"])
-           .chain(body.grade !== "" && (body.role !== 1 || body.role !== 2), tags.missingField, ["grade"])){
-                req.cnn.query('SELECT * from User where email = ?', body.email, (err, dupUser) => {
-                    if (dupUser.length > 0){
-                        vld.errors.push({tag : tags.duplicateEmail, params : null});
-                        vld.res.status(400).json(vld.errors);
-                    }
-                    // if a user is logged in and tries to make another account
-                    else if(req.session){
-                        vld.errors.push({tag : tags.prohibitedRegister, params : null});
-                        vld.res.status(401).json(vld.errors);
-                    }
-                    else {
-                        req.cnn.query('insert into User set ?', req.body, (err, result) => {
-                            if(err) throw err;
-                            sesh = new Session(req.body, res);
-                            res.location(router.baseURL + '/signup').status(200).end();
-                        });
-                    }
-                    req.cnn.release();
-                });
+    if (body.role === 0 && body.grade === null ){
+        vld.errors.push({tag : tags.missingField, params : ["grade"]});
+        vld.res.status(400).json(vld.errors); 
     }
+
+    async.waterfall([
+        function(cb){
+           if (vld.chain(body.email && body.email !== "", tags.missingField, ["email"])
+            .chain(body.firstName && body.firstName !== "", tags.missingField, ["firstName"])
+            .chain(body.lastName && body.lastName !== "", tags.missingField, ["lastName"])
+            .chain(body.password && body.password !== "", tags.missingField, ["password"])           
+            .chain(!req.session, tags.prohibitedRegister, null)
+            .chain(body.grade !== "" && (body.role !== 1 || body.role !== 2), tags.missingField, ["grade"])
+            .chain(body.role !== "", tags.missingField, ["role"])
+            .errorCheck(body.role >= 0 && body.role <= 2, tags.badValue, ["role"], cb)){
+                req.cnn.checkQuery('SELECT * from User where email = ?', body.email, cb)
+            }
+        },
+        function(dupUsr, fields, cb){
+            if (vld.errorCheck(!dupUsr.length, tags.duplicateEmail, null, cb)){
+                req.cnn.checkQuery('insert into User set ?', req.body,cb)
+            }
+        },
+        function(result, fields, cb){
+            sesh = new Session(req.body, res);
+            res.location(router.baseURL + '/signup').status(200).end();
+            cb();
+        }],
+        function(err){
+            req.cnn.release();
+        });
 });
 
 router.put('/', function(req, res){
@@ -77,39 +81,49 @@ router.put('/', function(req, res){
     req.cnn.release();
 });
 
-
 router.get('/', function(req, res){
     var email = req.body.email;
     if(req.session.checkAdmin()){
-        req.cnn.query('select id, email from User', null, (err, userArray) => {
+        req.cnn.query('select id, email from User;', null, (err, userArray) => {
             res.json(userArray);
             req.cnn.release();
         });
     }
-    else if (email && !req.session.checkAdmin()){
-        req.cnn.query('select id, email from User where email = ?',  email, (err, one_user) => {
+    else if (email){
+        req.cnn.query('select id, email from User where email = ?;',  email, (err, usrArr) => {
             if(err) throw err;
-            res.json(one_user);
+            var temp = [];
+            usrArr.forEach(function(curr){
+                if (curr.email === req.session.email){
+                    temp.push(curr);
+                }
+            });
+            res.json(temp);
             req.cnn.release();
         });
     }
-    else{
-        req.cnn.query('select id, email from User where id = ?', req.session.usrID, (err, result) =>{
+    else {
+        req.cnn.query('select id, email from User where email = ?;', req.session.email, (err, result) =>{
             if(err) throw err;
-            res.json(result);
+            var temp = [];
+            result.forEach(function(curr){
+                if (curr.email === req.session.email){
+                    temp.push(curr);
+                }
+            });
+            res.json(temp);
             req.cnn.release();
-
         });
     }
 
 });
 
-router.get('/:usrID', function(req, res){
+router.get('/:email', function(req, res){
     var validate = req.validate;
     async.waterfall([
         function(cb){
-            if(validate.checkUsr(parseInt(req.params.usrID), cb))
-                req.cnn.checkQuery('SELECT * User where id = ?', req.params.usrID, cb);
+            if(validate.checkUsr(parseInt(req.params.email), cb))
+                req.cnn.checkQuery('SELECT * User where email = ?', req.params.email, cb);
         },
         function(userArray, cb){
             if(validate.errorCheck(userArray.length, tags.userNotFound, undefined, cb)){
@@ -125,12 +139,12 @@ router.get('/:usrID', function(req, res){
 
 });
 
-router.delete('/:usrID', function(req, res){
+router.delete('/:email', function(req, res){
     var valid = req.validate;
     async.waterfall([
         function(cb){
             if(valid.checkAdmin()){
-                req.cnn.checkQuery('SELECT * User where id = ?', req.params.usrID, cb);
+                req.cnn.checkQuery('SELECT * User where id = ?', req.params.email, cb);
             }
             else{
                 req.cnn.release();
@@ -139,7 +153,7 @@ router.delete('/:usrID', function(req, res){
         },
         function(userArray, cb){
             if (valid.errorCheck(userArray.length, tags.userNotFound, undefined, cb)){
-                req.cnn.checkQuery('DELETE from User where id = ?', req.params.usrID, cb);
+                req.cnn.checkQuery('DELETE from User where id = ?', req.params.email, cb);
             }
         },
         function(cb){

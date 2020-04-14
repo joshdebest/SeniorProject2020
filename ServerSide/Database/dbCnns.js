@@ -22,7 +22,7 @@ dbCnns.router = function(req, res, next){
             res.status(500).json('Failed to connect to database' + err);
         }
         else {
-            console.log("Successful DB connection");
+            console.log("Got DB connection!");
             cnn.checkQuery = function(testQuery, params, cb){
                 this.query(testQuery, params, function(err, result, fields){
                     if(err)

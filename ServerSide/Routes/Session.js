@@ -10,8 +10,9 @@ var Session = function(user, res){
     //res.cookie(token);
     sessionByCookie[token] = this;
     sessionArray.push(this);
-    this.cookie = token;
+
     this.id = sessionArray.length - 1;
+    this.cookie = token;
     this.loginTime = new Date().getTime();
     this.authToken = token;
     this.usrID = user.id;
@@ -30,13 +31,8 @@ Session.prototype.logout = function(){
     delete sessionByCookie[this.authToken];
 }
 
-Session.findSession = function(token){
-    return sessionByCookie[token];
-}
-
-Session.getIDs = function(){
-    return Object.keys(sessionArray);
-}
+Session.findSession = token => sessionByCookie[token];
+Session.getIDs = () => Object.keys(sessionArray);
 
 // find any Session based on cookie
 // if session timed out delete session, or attach Session to the req

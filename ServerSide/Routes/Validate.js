@@ -28,9 +28,11 @@ Validate.prototype.errorCheck = function(checking, tag, params, cb){
         if(this.res){
             if (this.errors[0].tag === Validate.tags.permissionError)
                 this.res.status(403).end();
+            if (this.errors[0].tag === Validate.tags.prohibitedRegister)
+                this.res.status(401).json(this.errors);
             else{
                 console.log("errorcheck");
-                this.res.status(400).end();
+                this.res.status(400).json(this.errors);
             }
             this.res = null;
         }

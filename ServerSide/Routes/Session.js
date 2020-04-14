@@ -23,7 +23,7 @@ var Session = function(user, res){
     this.grade = user.grade;
 }
 
-Session.prototype.checkAdmin = function(){
+Session.prototype.isAdmin = function(){
     return this.role === 2;
 }
 Session.prototype.logout = function(){
@@ -32,7 +32,11 @@ Session.prototype.logout = function(){
 }
 
 Session.findSession = token => sessionByCookie[token];
-Session.getIDs = () => Object.keys(sessionArray);
+Session.getIDs = () => Object.keys(sessionByCookie);
+
+Session.getSsnsArray = function(){
+    return sessionArray;
+}
 
 // find any Session based on cookie
 // if session timed out delete session, or attach Session to the req

@@ -2,7 +2,7 @@
 var Validate = function(req, res){
     this.session = req.session;
     this.errors = [];  // Array of errors
-    this.res = res;
+    this.res = res;    // errors are reported here
 };
 
 Validate.tags = {
@@ -23,12 +23,15 @@ Validate.tags = {
 
 Validate.prototype.errorCheck = function(checking, tag, params, cb){
     if (!checking)
-        this.errors.push({tag : tag, params : params});
-    if (this.errors.length ){
+        this.errors.push({tag: tag, params: params});
+    if (this.errors.length){
         if(this.res){
-            if (this.errors[0].tag === Validate.tags.permissionError)
+            if (this.errors[0].tag === Validate.tags.permissionError){
+                console.log("errorcheck11");
                 this.res.status(403).end();
-            if (this.errors[0].tag === Validate.tags.prohibitedRegister)
+                console.log("errorcheck1");
+            }
+            else if (this.errors[0].tag === Validate.tags.prohibitedRegister)
                 this.res.status(401).json(this.errors);
             else{
                 console.log("errorcheck");
@@ -50,13 +53,13 @@ Validate.prototype.chain = function(checking, tag, params){
 }
 
 Validate.prototype.checkUsr = function(email, cb){
-    return this.errorCheck(this.session && (this.session.checkAdmin() || email === this.session.email),
-                            Validate.tags.permissionError, null, cb);
+    return this.errorCheck(this.session && (this.session.isAdmin() || email === this.session.email),
+       Validate.tags.permissionError, null, cb);
 };
 
 Validate.prototype.checkAdmin = function(cb) {
-    return this.errorCheck(this.session && this.session.checkAdmin(),
-     Validate.tags.permissionError, null, cb);
+    return this.errorCheck(this.session && this.session.isAdmin(),
+       Validate.tags.permissionError, null, cb);
  };
 
 module.exports = Validate;

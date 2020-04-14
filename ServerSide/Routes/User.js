@@ -44,20 +44,64 @@ router.post('/signup', function(req, res){
         });
 });
 
-router.put('/', function(req, res){
-    console.log("Hello");
-
+router.put('/:email', function(req, res){
     var body = req.body;
-    var validate = req.validate;
-    var sesh = req.session;
-    var email = req.query.email;
+    var vld = req.validate;
+    var ssn = req.session;
+    var email = req.params.email;
 
-    if (!("password" in req.body) || body.password === ""){
+    async.waterfall([
+        function(cb) {
+            if (vld.checkUsr(req.params.email, cb)) {
+              if (vld.errorCheck(!("password" in req.body) || body.password !== null 
+                  && body.password !== "", tags.badValue, ['password'], cb) &&
+                 // if role is changed it must be an admin
+                  vld.chain(!(req.body.role) || ssn.isAdmin(), tags.badValue, ["role"], cb)
+                  .chain(!req.body.email, tags.prohibitedField, ["email"], cb)
+                   
+                  // checking for oldPwd if non-admin
+                  .errorCheck(!("password" in req.body) || (("password" in req.body) && 
+                  ("oldPassword" in req.body) && (req.body.oldPassword !== "")) || ssn.isAdmin(), tags.noOldPassword, null, cb)) {
+
+                    req.cnn.checkQuery('select * from User where email = ?', email, cb);
+              }
+           } 
+        }, 
+        function(result, fields, cb) {
+           if (vld.errorCheck(result.length, tags.userNotFound, null, cb) &&
+                vld.errorCheck(body.password && result[0].password === body.oldPassword 
+                || body.password && ssn.isAdmin() || !body.password, tags.oldPwdIncorrect, null, cb)) {
+              
+              delete req.body.oldPassword;
+              req.cnn.checkQuery('UPDATE User set ? where email = ?', [req.body, email], cb);
+           }
+        }, 
+        function(result, fields, cb) {
+           cb();
+        }], 
+        function(err) {
+           req.cnn.release();
+           if (!err) {
+              res.status(200).end();
+           }
+        });
+});
+
+/*     if ("password" in req.body || body.password === "" && body.password === null){
         validate.errors.push({tag : tags.badValue, params : "password"});
         validate.res.status(400).json(validate.errors);    
     }
-    else if (!(req.body.oldPassword) || req.body.oldPassword === ""){
+                 
+    // checking for oldPwd if non-admin logged in
+    else if (!("password" in req.body) || (("password" in req.body) && ("oldPassword" in req.body) && 
+       req.body.oldPassword !== "") || ssn.isAdmin()){
+
         validate.errors.push({tag : tags.noOldPassword, params : "old password"});
+        validate.res.status(400).json(validate.errors); 
+    }
+    // checking that non-admin doesn't change role
+    else if (req.body.role && !(ssn.isAdmin())){
+        validate.errors.push({tag: tags.badValue, params: "role"});
         validate.res.status(400).json(validate.errors); 
     }
     else{
@@ -65,7 +109,7 @@ router.put('/', function(req, res){
             if(err) throw err;
             //if((body.password && result[0].password !== body.oldPassword) || (body.password && !(sesh.checkAdmin()))){
             //if(result[0].password !== body.oldPassword || body.password && !(sesh.checkAdmin())){
-            if(result[0].password !== body.oldPassword){
+            if(result[0].password !== body.oldPassword && !(ssn.isAdmin())){
                 validate.errors.push({tag : tags.oldPwdIncorrect, params : result[0].password});
                 validate.res.status(400).json(validate.errors); 
             }
@@ -78,30 +122,38 @@ router.put('/', function(req, res){
             }
         });
     }
-    req.cnn.release();
-});
+    req.cnn.release(); 
+}); */
+
+    // ------------------------------------
 
 router.get('/', function(req, res){
-    var email = req.body.email;
-    if(req.session.checkAdmin()){
+    var email = req.query.email;
+    if (email){
+        req.cnn.query('select id, email from User where email = ?;',  email, (err, usrArr) => {
+            if(req.session.isAdmin()){
+                res.json(usrArr);
+                req.cnn.release();
+            }
+            else{  
+                var temp = [];
+                usrArr.forEach(function(curr){
+                    if (curr.email === req.session.email){
+                        temp.push(curr);
+                    }
+                });
+                res.json(temp);
+                req.cnn.release();
+            }
+        });
+    }
+    else if(req.session.isAdmin()){
         req.cnn.query('select id, email from User;', null, (err, userArray) => {
             res.json(userArray);
             req.cnn.release();
         });
     }
-    else if (email){
-        req.cnn.query('select id, email from User where email = ?;',  email, (err, usrArr) => {
-            if(err) throw err;
-            var temp = [];
-            usrArr.forEach(function(curr){
-                if (curr.email === req.session.email){
-                    temp.push(curr);
-                }
-            });
-            res.json(temp);
-            req.cnn.release();
-        });
-    }
+    
     else {
         req.cnn.query('select id, email from User where email = ?;', req.session.email, (err, result) =>{
             if(err) throw err;
@@ -120,20 +172,27 @@ router.get('/', function(req, res){
 
 router.get('/:email', function(req, res){
     var validate = req.validate;
+    var curr_ssn = req.session;
+
     async.waterfall([
         function(cb){
-            if(validate.checkUsr(parseInt(req.params.email), cb))
-                req.cnn.checkQuery('SELECT * User where email = ?', req.params.email, cb);
+            if (!curr_ssn.isAdmin() && (curr_ssn.email !== req.params.email))
+                validate.res.status(403).end();            
+            else if (validate.checkUsr(req.params.email, cb))
+                req.cnn.checkQuery('SELECT * from User where email = ?;', req.params.email, cb);
         },
-        function(userArray, cb){
-            if(validate.errorCheck(userArray.length, tags.userNotFound, undefined, cb)){
+        function(userArray, fields, cb){
+            console.log("test2")
+            if(validate.errorCheck(userArray.length, tags.userNotFound, null, cb)){
+                console.log("test3")
+
                 delete userArray[0].password;  // to keep password hidden
-                res.json(userArray);    // return the array of users
+                res.json(userArray);    // return the users info
                 cb();
             }
         }
     ],
-    function(){
+    function(err){
         req.cnn.release();
     });
 

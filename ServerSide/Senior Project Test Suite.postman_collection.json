@@ -1621,10 +1621,10 @@
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"",
 									"var result = JSON.parse(responseBody);",
-									"tests[\"Body has an id\"] = result[0].id;",
+									"tests[\"Body has an id\"] = result[0].id === 5;",
 									"tests[\"Body has correct email\"] = result[0].email === \"mscott@pegasus.com\";",
 									"tests[\"Gets only one user\"] = result.length === 1;",
-									"tests[\"only get id and email\"] = Object.keys(result[0]).length === 2;"
+									"tests[\"Gets only id and email\"] = Object.keys(result[0]).length === 2;"
 								],
 								"type": "text/javascript"
 							}
@@ -1665,17 +1665,77 @@
 					"response": []
 				},
 				{
-					"name": "GET unauthorized",
+					"name": "GET/{email} Michael good",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5a8880e-d437-4dfd-a5cc-70a6d5ecd452",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var res = JSON.parse(responseBody);",
+									"tests[\"only get one person back\"] = res.length === 1;",
+									"",
+									"tests[\"Body has an id\"] = res[0].id === 5;",
+									"tests[\"Correct fname\"] = res[0].firstName === \"Michael\";",
+									"tests[\"Correct lname\"] = res[0].lastName === \"Scott\";",
+									"tests[\"Correct email\"] = res[0].email === \"mscott@pegasus.com\";",
+									"tests[\"Correct role\"] = res[0].role === 0;",
+									"tests[\"Correct grade\"] = res[0].grade === 7;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/mscott@pegasus.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"mscott@pegasus.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TODO!! GET/{email} unauthorized",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "fa7dcb35-6b42-49c4-8873-a445bbed53bc",
 								"exec": [
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Status code is 403\"] = responseCode.code === 403;",
 									"",
 									"var result = JSON.parse(responseBody);",
 									"tests[\"Gets 0 users\"] = result.length === 0;",
+									"tests[\"no response body\"] = !responseBody;",
 									""
 								],
 								"type": "text/javascript"
@@ -1697,7 +1757,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\" : \"jdebest@email.com\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1705,12 +1765,68 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
+								"Usr",
+								"jdebest@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TODO!! GET/{email} doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa7dcb35-6b42-49c4-8873-a445bbed53bc",
+								"exec": [
+									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"",
+									"var res = JSON.parse(responseBody);",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"userNotFound\");",
+									"tests[\"Gets 0 users\"] = res.length === 0;",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/corona@email.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"corona@email.com"
 							]
 						}
 					},
@@ -1724,8 +1840,12 @@
 							"script": {
 								"id": "fa7dcb35-6b42-49c4-8873-a445bbed53bc",
 								"exec": [
-									"tests[\"Status code is 401\"] = responseCode.code === 401;",
-									""
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var result = JSON.parse(responseBody);",
+									"",
+									"//Returns an array of length 0",
+									"tests[\"Gets 0 users\"] = result.length === 0;"
 								],
 								"type": "text/javascript"
 							}
@@ -1814,13 +1934,6 @@
 									"var cookie = postman.getResponseCookie(\"debestAuth\");",
 									"tests[\"Cookie Exists\"] = cookie && cookie.value !== undefined;",
 									"",
-									"var locURL = postman.getResponseHeader(\"Location\")",
-									"locURL = locURL && locURL.split('/');",
-									"",
-									"tests[\"Location returned\"] = locURL;",
-									"",
-									"console.log(locURL);",
-									"",
 									"postman.setEnvironmentVariable(\"curLoginCookie\", cookie.value);"
 								],
 								"type": "text/javascript"
@@ -1860,7 +1973,7 @@
 					"response": []
 				},
 				{
-					"name": "Admin GET Michael",
+					"name": "Admin GET/{email} Michael",
 					"event": [
 						{
 							"listen": "test",
@@ -1869,11 +1982,14 @@
 								"exec": [
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"",
-									"var result = JSON.parse(responseBody);",
-									"tests[\"Body has an id\"] = result[0].id;",
-									"tests[\"Body has correct email\"] = result[0].email === \"jdebest@email.com\";",
-									"tests[\"Gets only one user\"] = result.length === 2;",
-									"tests[\"only get an id and email\"] = Object.keys(result[0]).length === 2;"
+									"var res = JSON.parse(responseBody);",
+									"tests[\"only get one person back\"] = res.length === 1;",
+									"tests[\"Body has an id\"] = res[0].id === 5;",
+									"tests[\"Correct fname\"] = res[0].firstName === \"Michael\";",
+									"tests[\"Correct lname\"] = res[0].lastName === \"Scott\";",
+									"tests[\"Correct email\"] = res[0].email === \"mscott@pegasus.com\";",
+									"tests[\"Correct role\"] = res[0].role === 0;",
+									"tests[\"Correct grade\"] = res[0].grade === 7;"
 								],
 								"type": "text/javascript"
 							}
@@ -1902,12 +2018,66 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr",
+							"raw": "{{url}}/Usr/mscott@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
+								"Usr",
+								"mscott@pegasus.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET/{email} doesn't exist Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa7dcb35-6b42-49c4-8873-a445bbed53bc",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"var res = JSON.parse(responseBody);",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"userNotFound\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/corona@email.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"corona@email.com"
 							]
 						}
 					},
@@ -1926,10 +2096,10 @@
 									"tests[\"person in question\"] = (JSON.parse(responseBody)).length !== 0;",
 									"",
 									"var result = JSON.parse(responseBody);",
-									"tests[\"Body has an id\"] = result[0].id;",
+									"tests[\"Body has an id\"] = result[0].id === 5;",
 									"tests[\"Body has correct email\"] = result[0].email === \"mscott@pegasus.com\";",
 									"tests[\"Gets only one user\"] = result.length === 1;",
-									"tests[\"returns right num of fields\"] = Object.keys(result[0]).length === 6;"
+									"tests[\"returns right num of fields\"] = Object.keys(result[0]).length === 2;"
 								],
 								"type": "text/javascript"
 							}
@@ -1986,7 +2156,7 @@
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"",
 									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets three users\"] = result.length === 3;",
+									"tests[\"Gets five users\"] = result.length === 5;",
 									""
 								],
 								"type": "text/javascript"
@@ -2022,6 +2192,52 @@
 							],
 							"path": [
 								"Usr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin logout Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "25c56caf-9e09-4525-9294-0ed77cb9f8f5",
+								"exec": [
+									"tests[\"Successful logout\"] = responseCode.code === 200;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Ssns/{{curLoginCookie}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Ssns",
+								"{{curLoginCookie}}"
 							]
 						}
 					},
@@ -2109,6 +2325,53 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\"email\": \"jdebest@email.com\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Ssns/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Ssns",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin login pwd incorrect",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "25c56caf-9e09-4525-9294-0ed77cb9f8f5",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"tests[\"failedLogin error tag is present\"] = responseBody.has(\"failedLogin\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\" : \"jdebest@email.com\", \"password\": \"lol\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2224,11 +2487,10 @@
 								"exec": [
 									"//admin",
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets my session\"] = result.length === 1;",
-									"tests[\"Body has an id\"] = result[0].id;",
-									"tests[\"Body has correct email\"] = result[0].email === \"jdebest@pegasus.com\";",
-									"tests[\"gets id, cookie, usrID, and loginTime\"] = Object.keys(result[0]).length === 4;"
+									"var res = JSON.parse(responseBody);",
+									"tests[\"Gets id, usrID, and loginTime\"] = Object.keys(res).length === 3;",
+									"tests[\"Good loginTime\"] = res.loginTime > 0;",
+									"tests[\"Correct usrID\"] = res.usrID === 1;"
 								],
 								"type": "text/javascript"
 							}
@@ -2263,13 +2525,8 @@
 							"script": {
 								"id": "0e785d50-b85f-41e5-8319-782f14fc8215",
 								"exec": [
-									"//admin",
-									"tests[\"Status code is 200\"] = responseCode.code === 200;",
-									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets my session\"] = result.length === 1;",
-									"tests[\"Body has an id\"] = result[0].id;",
-									"tests[\"Body has correct email\"] = result[0].email === \"mscott@pegasus.com\";",
-									"tests[\"gets id, cookie, usrID, and loginTime\"] = Object.keys(result[0]).length === 4;"
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -2291,6 +2548,42 @@
 							"path": [
 								"Ssns",
 								"{{mscottLogin}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Ssns doesn't exist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0e785d50-b85f-41e5-8319-782f14fc8215",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/Ssns/{{lala}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Ssns",
+								"{{lala}}"
 							]
 						}
 					},
@@ -2477,7 +2770,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"LeBron\",\n    \"lastName\" : \"James\",\n    \"password\" : \"letsgooooo\",\n    \"oldPassword\" : \"lakernation\",\n    \"grade\": null\n}",
+							"raw": "{\n    \"firstName\": \"LeBron\",\n    \"lastName\" : \"James\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2485,19 +2778,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2512,7 +2799,7 @@
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"noOldPassword\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Missing old password\"] = (\"noOldPassword\" === JSON.parse(responseBody)[0][\"tag\"]);"
 								],
 								"type": "text/javascript"
 							}
@@ -2538,19 +2825,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2565,7 +2846,9 @@
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"missingField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Has Error Tags\"] = (\"badValue\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"",
+									"tests[\"Has Error params\"] = (\"password\" === JSON.parse(responseBody)[0][\"params\"][0]);"
 								],
 								"type": "text/javascript"
 							}
@@ -2591,26 +2874,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"lebron@pegasus.com"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Password Mismatch",
+					"name": "Old Password Incorrect",
 					"event": [
 						{
 							"listen": "test",
@@ -2645,19 +2922,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2671,8 +2942,10 @@
 							"script": {
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
+									"// can't change email",
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"tests[\"Has Error Params\"] = (\"email\" === JSON.parse(responseBody)[0][\"params\"][0]);"
 								],
 								"type": "text/javascript"
 							}
@@ -2690,7 +2963,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"jamesgang@pegasus.com\",\n    \"firstName\": \"Lebron\",\n    \"lastName\" : \"james\",\n    \"password\" : \"lakernation\",\n    \"role\"     : 1,\n    \"grade\": null\n}",
+							"raw": "{\n    \"email\": \"jamesgang@pegasus.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2698,19 +2971,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2725,7 +2992,8 @@
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Has Error Tags\"] = (\"badValue\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"tests[\"Has Error Params\"] = (\"role\" === JSON.parse(responseBody)[0][\"params\"][0]);"
 								],
 								"type": "text/javascript"
 							}
@@ -2743,7 +3011,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"LeBron\",\n    \"lastName\" : \"James\",\n    \"role\"     : 2,\n}",
+							"raw": "{\n    \"firstName\": \"LeBron\",\n    \"lastName\" : \"James\",\n    \"role\"     : 2\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2751,18 +3019,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"Usr",
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2803,18 +3066,60 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
+								"Usr",
+								"lebron@pegasus.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Successful pwd change back",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
+								"exec": [
+									"tests[\"Status code is 200: Bad Request\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\" : \"lakernation\",\n    \"oldPassword\" : \"2020champs\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2865,10 +3170,7 @@
 									"",
 									"var locURL = postman.getResponseHeader(\"Location\")",
 									"locURL = locURL && locURL.split('/');",
-									"",
 									"tests[\"Location returned\"] = locURL;",
-									"",
-									"console.log(locURL);",
 									"postman.setEnvironmentVariable(\"dwightCookie\", cookie.value);"
 								],
 								"type": "text/javascript"
@@ -2887,7 +3189,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\" : \"dschrute@pegasusschool.com\", \"password\": \"bearsbeetbattlestargalatica\"}\n\n{\n    \"email\": \"dschrute@pegasusschool.com\",\n    \"firstName\": \"Dwight\",\n    \"lastName\" : \"Schrute\",\n    \"password\" : \"bearsbeetbattlestargalatica\",\n    \"role\"     : 0,\n    \"grade\"\t   : 8\n}\n",
+							"raw": "{\"email\" : \"dschrute@pegasusschool.com\", \"password\": \"bearsbeetbattlestargalatica\"}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2915,7 +3217,7 @@
 							"script": {
 								"id": "8f5ab771-e063-4ba2-87f7-b4e16943edb7",
 								"exec": [
-									"tests[\"Status code is 401: Unauthorized\"] = responseCode.code === 401;",
+									"tests[\"Status code is 403: Unauthorized\"] = responseCode.code === 403;",
 									""
 								],
 								"type": "text/javascript"
@@ -2934,7 +3236,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"Bronny\",\n    \"lastName\" : \"James\",\n}",
+							"raw": "{\n    \"firstName\": \"Bronny\",\n    \"lastName\" : \"James\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2942,18 +3244,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"Usr",
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -2968,7 +3265,8 @@
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"noOldPassword\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Missing old password\"] = (\"noOldPassword\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -2986,7 +3284,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\" : \"newpassword\",\n    \"oldPassword\" : \"\"\n\n}",
+							"raw": "{\n    \"password\" : \"newpassword\",\n    \"oldPassword\" : \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2994,19 +3292,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3020,8 +3312,12 @@
 							"script": {
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
+									"var res = JSON.parse(responseBody);",
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"missingField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"badValue\");",
+									"tests['Correct param returned'] = res[0].params && res[0].params.length === 1 && res[0].params[0] === 'password';",
+									" "
 								],
 								"type": "text/javascript"
 							}
@@ -3047,19 +3343,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3101,19 +3391,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3154,18 +3438,60 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
+								"Usr",
+								"dschrute@pegasusschool.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Successful pwd change back",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
+								"exec": [
+									"tests[\"Status code is 200: Bad Request\"] = responseCode.code === 200;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\" : \"bearsbeetbattlestargalatica\",\n    \"oldPassword\" : \"beets\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3179,8 +3505,10 @@
 							"script": {
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
+									"// AU is non-admin so changing role is not allowed",
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Has Error Tags\"] = (\"badValue\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"tests[\"Has Params\"] = (\"role\" === JSON.parse(responseBody)[0][\"params\"][0]);"
 								],
 								"type": "text/javascript"
 							}
@@ -3206,18 +3534,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"Usr",
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3231,8 +3554,12 @@
 							"script": {
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
 									"tests[\"Status code is 400: Bad Request\"] = responseCode.code === 400;",
-									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);"
+									"tests[\"Has Error Tags\"] = (\"prohibitedField\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"tests['Correct param returned'] = res[0].params && res[0].params.length === 1 && res[0].params[0] === 'email';",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -3258,18 +3585,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"Usr",
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3310,18 +3632,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"Usr",
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3363,18 +3680,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=lebron@pegasus.com",
+							"raw": "{{url}}/Usr/lebron@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "lebron@pegasus.com"
-								}
+								"Usr",
+								"lebron@pegasus.com"
 							]
 						}
 					},
@@ -3416,18 +3728,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=dschrute@pegasusschool.com",
+							"raw": "{{url}}/Usr/dschrute@pegasusschool.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "dschrute@pegasusschool.com"
-								}
+								"Usr",
+								"dschrute@pegasusschool.com"
 							]
 						}
 					},
@@ -3500,7 +3807,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"kathy@pegasus.com\",\n    \"firstName\": \"Katherine\",\n    \"lastName\" : \"Bennett\"\n    \"password\" : \"debest\",\n    \"role\"     : 0,\n    \"grade\": 5\n}",
+							"raw": "{\n    \"email\": \"kathy@pegasus.com\",\n    \"firstName\": \"Katherine\",\n    \"lastName\" : \"Bennett\",\n    \"password\" : \"debest\",\n    \"role\"     : 0,\n    \"grade\": 5\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3567,8 +3874,6 @@
 									"locURL = locURL && locURL.split('/');",
 									"",
 									"tests[\"Location returned\"] = locURL;",
-									"",
-									"console.log(locURL);",
 									"",
 									"postman.setEnvironmentVariable(\"adminLogin\", cookie.value);"
 								],
@@ -3643,19 +3948,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3669,7 +3968,7 @@
 							"script": {
 								"id": "6b426ac5-4653-4d76-921c-e93c801c1576",
 								"exec": [
-									"tests[\"Status code is 200: Bad Request\"] = responseCode.code === 200;",
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									""
 								],
 								"type": "text/javascript"
@@ -3696,18 +3995,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3748,18 +4042,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3792,7 +4081,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\" : \"\",\n}",
+							"raw": "{\n    \"password\" : \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3800,18 +4089,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3852,18 +4136,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3904,18 +4183,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -3957,18 +4231,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"kathy@pegasus.com"
 							]
 						}
 					},
@@ -4001,7 +4270,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"firstName\": \"test\",\n    \"lastName\" : \"test\",\n}",
+							"raw": "{\n    \"firstName\": \"test\",\n    \"lastName\" : \"test\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4009,19 +4278,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=jdebest@email.com",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "jdebest@email.com"
-								}
+								"jdebest@email.com"
 							]
 						}
 					},
@@ -4054,7 +4317,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\" : \"newpassword\",\n}",
+							"raw": "{\n    \"password\" : \"newpassword\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4062,18 +4325,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=jdebest@email.com",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "jdebest@email.com"
-								}
+								"Usr",
+								"jdebest@email.com"
 							]
 						}
 					},
@@ -4114,18 +4372,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr?email=kathy@pegasus.com",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"Usr"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "kathy@pegasus.com"
-								}
+								"Usr",
+								"jdebest@email.com"
 							]
 						}
 					},
@@ -4166,19 +4419,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=jdebest@email.com",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "jdebest@email.com"
-								}
+								"jdebest@email.com"
 							]
 						}
 					},
@@ -4211,7 +4458,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"firstName\" :\"Josh\",\n\t\"lastName\":\"DeBest\",\n\t\"password\" : \"password\",\n\t\"role\" : 2,\n\t\"grade\": null\n}",
+							"raw": "{\n\t\"firstName\" :\"Josh\",\n\t\"lastName\":\"DeBest\",\n\t\"password\" : \"password\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4219,19 +4466,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/Usr/?email=jdebest@email.com",
+							"raw": "{{url}}/Usr/jdebest@email.com",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Usr",
-								""
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "jdebest@email.com"
-								}
+								"jdebest@email.com"
 							]
 						}
 					},
@@ -4248,7 +4489,7 @@
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"",
 									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets three users\"] = result.length === 4;",
+									"tests[\"Gets three users\"] = result.length === 7;",
 									""
 								],
 								"type": "text/javascript"

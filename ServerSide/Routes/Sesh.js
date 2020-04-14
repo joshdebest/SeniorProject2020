@@ -10,26 +10,29 @@ router.get('/', function(req, res){
     var sesh;
     var body = [];
     if (req.validate.checkAdmin()){
-        Session.getIDs().foreach(id => {
+        Session.getIDs().forEach(id => {
             sesh = Session.findSession(id);
-            body.push({id : sesh.id, cookie : sesh.token, usrID : sesh.usrID, loginTime : sesh.loginTime});
+            body.push({id: sesh.id, usrID: sesh.usrID, loginTime: sesh.loginTime});
         });
-        res.status(200).end();
-        res.cnn.release();
+        res.status(200).json(body);
+        req.cnn.release();
     }
     else{
         res.status(400).end();
-        res.cnn.release();
+        req.cnn.release();
     } 
 });
 
 
 // gets a specific session
-router.get('/:id', function(req, res){
-    var currSsn = Session.findSession(req.params.id);
-    
-    if (req.validate.checkUsr(parseInt(currSsn.usrID)), cb){
-        res.json({id : currSsn.id, cookie : currSsn.token, usrID : currSsn.usrID, loginTime : currSsn.loginTime});
+router.get('/:cookie', function(req, res){
+    var getSsn = Session.findSession(req.params.cookie);
+
+    if (getSsn === undefined){
+        res.status(400).end();
+    }
+    else if (req.validate.checkUsr(getSsn.email)){
+        res.status(200).json({id : getSsn.id, usrID : getSsn.usrID, loginTime : getSsn.loginTime});
     }
     req.cnn.release();
 });

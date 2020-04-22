@@ -27,14 +27,12 @@ Validate.prototype.errorCheck = function(checking, tag, params, cb){
     if (this.errors.length){
         if(this.res){
             if (this.errors[0].tag === Validate.tags.permissionError){
-                console.log("errorcheck11");
-                this.res.status(403).end();
-                console.log("errorcheck1");
+               // this.res.status(403).end();
+                this.res.status(403).json(this.errors);
             }
             else if (this.errors[0].tag === Validate.tags.prohibitedRegister)
                 this.res.status(401).json(this.errors);
             else{
-                console.log("errorcheck");
                 this.res.status(400).json(this.errors);
             }
             this.res = null;
@@ -59,7 +57,7 @@ Validate.prototype.checkUsr = function(email, cb){
 
 Validate.prototype.checkAdmin = function(cb) {
     return this.errorCheck(this.session && this.session.isAdmin(),
-       Validate.tags.permissionError, null, cb);
+        Validate.tags.permissionError, null, cb);
  };
 
 module.exports = Validate;

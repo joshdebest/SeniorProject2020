@@ -40,7 +40,7 @@ router.get('/:cookie', function(req, res){
 // create a new session
 router.post('/login', function(req, res){
     var sesh;
-    req.cnn.checkQuery('SELECT * from User where email = ?', [req.body.email],
+    req.cnn.tryQuery('SELECT * from User where email = ?', [req.body.email],
         function(err, result){
             if(req.validate.errorCheck(result && result.length && result[0].password === req.body.password, tags.failedLogin)){
                 sesh = new Session(result[0], res);
@@ -58,7 +58,8 @@ router.delete('/:cookie', function(req, res){
 
     async.waterfall([
         function(cb){
-            if (currSsn.usrID === vld.session.usrID){                
+            if (vld.errorCheck(currSsn, tags.sessionNotFound, null, cb)
+                && vld.errorCheck(currSsn.usrID === vld.session.usrID)){                
                 currSsn.logout();
                 cb();
             }

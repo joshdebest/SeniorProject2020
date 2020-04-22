@@ -7,15 +7,13 @@ var Validate = require('./Routes/Validate.js');
 var dbCnns = require('./Database/dbCnns.js');
 var createError = require('http-errors');
 
-var async = require('async');
-
 var app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
     console.log("Handling " + req.method + '/' + req.path);
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
+    //res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
     res.header("Access-Control-Allow-Credentials", true);
     res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, OPTIONS, GET");
     res.header("Access-Control-Expose-Headers", "Location");
@@ -56,15 +54,6 @@ app.delete('/DB', function(req, res){
     req.cnn.query('alter table User auto_increment = 1;');
     req.cnn.query('insert into User (email, firstName, lastName, password, role, grade) VALUES ("jdebest@email.com", "Josh", "DeBest", "password", 2, null);');
 
-   /* ids = Session.getIDs;
-    console.log(Session.session);
-    for (i = 0; ids.length; i++){
-        Session.findSession(i).logOut();
-    }
-
-    Session.getIDs().forEach(id => {
-        Session.findSession(id).logOut();
-    });*/
     req.session.logout();
     res.status(200).end();
     req.cnn.release();

@@ -23,12 +23,11 @@ dbCnns.router = function(req, res, next){
         }
         else {
             console.log("Got DB connection!");
-            cnn.checkQuery = function(testQuery, params, cb){
-                this.query(testQuery, params, function(err, result, fields){
+            cnn.tryQuery = function(testQuery, params, cb){
+                this.query(testQuery, params, function(err, result){
                     if(err)
                         res.status(500).json('Failed query ' + testQuery);
-                    console.log("PLS");
-                    cb(err, result, fields);
+                    cb(err, result);
                 });
             };
             req.cnn = cnn;

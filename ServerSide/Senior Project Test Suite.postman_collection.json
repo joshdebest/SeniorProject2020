@@ -1724,7 +1724,7 @@
 					"response": []
 				},
 				{
-					"name": "TODO!! GET/{email} unauthorized",
+					"name": "GET/{email} unauthorized",
 					"event": [
 						{
 							"listen": "test",
@@ -1733,9 +1733,10 @@
 								"exec": [
 									"tests[\"Status code is 403\"] = responseCode.code === 403;",
 									"",
-									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets 0 users\"] = result.length === 0;",
-									"tests[\"no response body\"] = !responseBody;",
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"permissionError\");",
+									"tests['Correct param returned'] = res[0].params === 'unauthorized request'; ",
 									""
 								],
 								"type": "text/javascript"
@@ -1778,19 +1779,19 @@
 					"response": []
 				},
 				{
-					"name": "TODO!! GET/{email} doesn't exist",
+					"name": "GET/{email} doesn't exist",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"id": "fa7dcb35-6b42-49c4-8873-a445bbed53bc",
 								"exec": [
-									"tests[\"Status code is 404\"] = responseCode.code === 404;",
+									"tests[\"Status code is 403\"] = responseCode.code === 403;",
 									"",
 									"var res = JSON.parse(responseBody);",
-									"tests[\"Correct tag returned\"] = responseBody.has(\"userNotFound\");",
-									"tests[\"Gets 0 users\"] = res.length === 0;",
 									"",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"permissionError\");",
+									"tests['Correct param returned'] = res[0].params === 'unauthorized request'; ",
 									""
 								],
 								"type": "text/javascript"
@@ -3171,7 +3172,7 @@
 									"var locURL = postman.getResponseHeader(\"Location\")",
 									"locURL = locURL && locURL.split('/');",
 									"tests[\"Location returned\"] = locURL;",
-									"postman.setEnvironmentVariable(\"dwightCookie\", cookie.value);"
+									"postman.setEnvironmentVariable(\"dwightLogin\", cookie.value);"
 								],
 								"type": "text/javascript"
 							}
@@ -3218,6 +3219,8 @@
 								"id": "8f5ab771-e063-4ba2-87f7-b4e16943edb7",
 								"exec": [
 									"tests[\"Status code is 403: Unauthorized\"] = responseCode.code === 403;",
+									"tests[\"Permission error\"] = (\"permissionError\" === JSON.parse(responseBody)[0][\"tag\"]);",
+									"",
 									""
 								],
 								"type": "text/javascript"
@@ -3758,13 +3761,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/Ssns/{{dwightCookie}}",
+							"raw": "{{url}}/Ssns/{{dwightLogin}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"Ssns",
-								"{{dwightCookie}}"
+								"{{dwightLogin}}"
 							]
 						}
 					},
@@ -3987,7 +3990,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\" : \"newpassword\",\n}",
+							"raw": "{\n    \"password\" : \"newpassword\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4034,7 +4037,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"password\" : \"newnewpassword\",\n}",
+							"raw": "{\n    \"password\" : \"newnewpassword\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4196,6 +4199,58 @@
 					"response": []
 				},
 				{
+					"name": "GET All Users before DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5a8880e-d437-4dfd-a5cc-70a6d5ecd452",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var result = JSON.parse(responseBody);",
+									"tests[\"Gets Seven Users\"] = result.length === 7;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE Kathy",
 					"event": [
 						{
@@ -4238,6 +4293,110 @@
 							"path": [
 								"Usr",
 								"kathy@pegasus.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Kathy (user doesnt exist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5a8880e-d437-4dfd-a5cc-70a6d5ecd452",
+								"exec": [
+									"tests[\"Status code is 400\"] = responseCode.code === 400;",
+									"",
+									"var res = JSON.parse(responseBody);",
+									"tests[\"Correct tag returned\"] = responseBody.has(\"userNotFound\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr/kathy@pegasus.com",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr",
+								"kathy@pegasus.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET All Users After DELETE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f5a8880e-d437-4dfd-a5cc-70a6d5ecd452",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"",
+									"var result = JSON.parse(responseBody);",
+									"tests[\"Gets Six Users\"] = result.length === 6;",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/Usr",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"Usr"
 							]
 						}
 					},
@@ -4489,7 +4648,7 @@
 									"tests[\"Status code is 200\"] = responseCode.code === 200;",
 									"",
 									"var result = JSON.parse(responseBody);",
-									"tests[\"Gets three users\"] = result.length === 7;",
+									"tests[\"Gets Six Users\"] = result.length === 6;",
 									""
 								],
 								"type": "text/javascript"

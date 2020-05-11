@@ -4,9 +4,10 @@ const baseURL = "http://localhost:3001/";
 //const baseURL = "http://www.debestrobotics.com/";
 
 var currSessionCookie;
+var sessionId;
+
 const headers = new Headers();
 headers.set('Content-Type', 'application/JSON');
-
 
 function myFetch(method, endpoint, body){
    return fetch(baseURL + endpoint, {
@@ -47,12 +48,27 @@ export function signUp(info){
    return post('Usr', info).catch(err => {throw err});
 }
 
-export function logIn(creds){
+export function templogIn(creds){
    return post('Ssns', creds).catch(err => {throw err});
 }
 
 export function logOut(){
    return del('Ssns/' + currSessionCookie).catch(err => {throw err});
+}
+
+export function logIn(cred) {
+   return post("Ssns", cred)
+      .then(response => {
+         let location = response.headers.get("Location").split('/');
+         sessionId = location[location.length - 1];
+         console.log("Got session " + sessionId);
+         return get("Ssns/" + sessionId)
+      })
+      .then(response => response.json())   // ..json() returns a Promise!
+      .then(rsp => get('Prss/' + rsp.prsId))
+      .then(userResponse => userResponse.json())
+      .then(rsp => rsp[0])
+      .catch(err => {console.log('err was this',err);throw err}) 
 }
 
 /**

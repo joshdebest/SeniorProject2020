@@ -8,14 +8,16 @@ import store from './store';
 import 'bootstrap/dist/css/bootstrap.css'; // Bootstrap
 import './index.css';
 
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. 
+serviceWorker.unregister();
+
 const router = (
    <Provider store={store}>
-      <BrowserRouter><App/></BrowserRouter>
+      <BrowserRouter>
+         <App/>
+      </BrowserRouter>
    </Provider>
 )
 
 ReactDOM.render(router, document.getElementById('root'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. 
-serviceWorker.unregister();

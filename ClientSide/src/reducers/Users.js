@@ -1,4 +1,4 @@
-function Users(state = {}, action) {
+export default function Users(state = {}, action) {
    console.log("User reducing action " + action.type);
    switch(action.type) {
    case 'LOGIN':
@@ -11,5 +11,3 @@ function Users(state = {}, action) {
       return state;
    }
 }
-
-export default Users;

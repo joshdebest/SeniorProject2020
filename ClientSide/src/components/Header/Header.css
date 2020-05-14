@@ -1,0 +1,22 @@
+.navbar { 
+   background-color: #222; 
+   font-size: 20px;
+}
+
+a, .navbar-nav, .navbar-light .nav-link {
+  color: #9FFFCB;
+  padding-left: 5px;
+}
+.nav-link {
+  padding-right: 500px;
+}
+.navbar-brand {
+  font-size: 1.4em;
+  color: #9FFFCB;
+}
+#ml-auto {
+  padding-right: 50px
+}
+img {
+  padding-left: -10px;
+}

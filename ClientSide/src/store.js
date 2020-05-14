@@ -2,13 +2,9 @@ import { createStore, applyMiddleware } from 'redux';
 import { createBrowserHistory } from 'history';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import rootReducer from './reducers/index';
-
-//function myCompose(){
-//   return composeWithDevTools(applyMiddleware(thunk));}
+import rootReducer from './reducers';
  
 const initState = {};
-const store = createStore(rootReducer, initState, composeWithDevTools(applyMiddleware(thunk)));
 
 if (module.hot) {
    module.hot.accept('./reducers/',() => {
@@ -18,4 +14,4 @@ if (module.hot) {
 }
 
 export const history = createBrowserHistory();
-export default store;
+export const store = createStore(rootReducer(history), initState, composeWithDevTools(applyMiddleware(thunk)));

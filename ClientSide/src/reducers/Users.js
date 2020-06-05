@@ -3,6 +3,8 @@ export default function Users(state = {}, action) {
    switch(action.type) {
    case 'LOGIN':
       return action.user;
+   case 'REGISTER':
+      return action.user;
    case 'LOGOUT':
       return {}; // Clear user state
    case 'LOGIN_ERROR':

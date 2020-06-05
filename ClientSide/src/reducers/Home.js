@@ -1,4 +1,4 @@
-export default function Home(state = {}, action) {
+export default function Home(state = [], action) {
   switch (action.type) {
     case 'HOME_PAGE_LOADED':
       return {};

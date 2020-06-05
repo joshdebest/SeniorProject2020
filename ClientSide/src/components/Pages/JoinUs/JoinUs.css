@@ -1,0 +1,20 @@
+.joinUs{
+   width: 100%;
+}
+.joinUsImg {
+   width: 100%;
+   height: 500px;
+   filter: contrast(50%);
+}
+.centered {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   font-size: 75px;
+   text-align: center;
+   color: white;
+   font-weight: bolder;
+ }
+.pagetxt{
+   font-size: 100px;
+}

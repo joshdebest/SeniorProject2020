@@ -1,0 +1,50 @@
+.centered {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   font-size: 50px;
+   text-align: center;
+   color: black;
+ }
+ .contactUsImg{
+   width: 100%;
+   height: 500px;
+   filter: contrast(50%);
+ }
+
+ .contactUs_social_media { 
+   list-style-type: none;
+	padding: 0px;
+	display: table;
+	margin-top: 10px;
+	margin-right: auto;
+	margin-bottom: 10px;
+	margin-left: auto;
+}
+.contactUs_social_media li { 
+   padding-left: 5px;
+   padding-right: 5px; 
+   padding-top: 10px; 
+   display: inline-block;
+   list-style: none;
+}
+.contactUs_social_media li a { 
+   color:black; 
+   border: 1px solid black; 
+   padding: 8px;
+   border-radius: 50%;
+}
+.contactUssocial_media li i {  
+   width: 20px; 
+   height: 20px; 
+   text-align:center;
+}
+.contactinfo{
+   font-size: 20px;
+   text-align: left;
+}
+.contactHeader{
+   padding-bottom: 20px;
+   text-align: left;
+}

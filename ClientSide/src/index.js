@@ -4,17 +4,21 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {Provider} from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
-import { Route, Switch } from 'react-router-dom';
-import { store, history } from './store';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
+import history from './store';
+import store from './store';
 import 'bootstrap/dist/css/bootstrap.css'; // Bootstrap
 import './index.css';
 
 ReactDOM.render((
    <Provider store={store}>
-      <ConnectedRouter history={history}>
+      <BrowserRouter>
          <Switch>
             <Route path="/" component={App} />
          </Switch>
-      </ConnectedRouter>
+      </BrowserRouter>
    </Provider>
 ), document.getElementById('root'));
+
+// Learn more about service workers: http://bit.ly/CRA-PWA
+serviceWorker.unregister();

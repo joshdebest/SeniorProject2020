@@ -4,3 +4,9 @@
 #navbarHeader {
    padding-right: 500px;
 }
+  
+main > .container {
+   padding: 30px 15px 0;
+   margin-bottom: 100px;
+   min-height: 400px;
+ }

@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import {Form, FormGroup, Row, Col, FormControl, Button} from 'react-bootstrap';
+import {Form, FormGroup, Row, Col, FormControl, Button, Nav} from 'react-bootstrap';
+import {LinkContainer} from 'react-router-bootstrap';
+import Auth from '../../redux/Auth';
 import './LogIn.css';
 
 class LogIn extends Component {
@@ -8,8 +10,9 @@ class LogIn extends Component {
 
       // Current login state
       this.state = {
-         email: 'adm@11.com',
-         password: 'password'
+         email: 'jdebest@email.com',
+         password: 'password',
+         user_token: ''
       }
 
        // bind 'this' to the correct context
@@ -20,6 +23,7 @@ class LogIn extends Component {
    // Call redux actionCreator login via props.
    logIn(event) {
       console.log("Component login with " + this.state.email);
+      this.props.logIn(this.state, () => this.props.history.push('/'));
       event.preventDefault()
    }
 
@@ -39,7 +43,7 @@ class LogIn extends Component {
       console.log("Rendering logIn");
       return (
          <section className="container">
-            <Col sm={{offset: 2}}>
+            <Col>
                <h1>Log in</h1>
             </Col>
             <Form>
@@ -73,10 +77,13 @@ class LogIn extends Component {
                </FormGroup>
            
                <FormGroup >
-                  <Col sm={{offset: 2}}>
+                  <Col>
                      <Button className="loginbutton" type="submit" onClick={this.logIn}>
                         Sign in
                      </Button>
+                     <LinkContainer to='/register'>
+                        <Nav.Link>Create Account</Nav.Link>
+                     </LinkContainer>
                  </Col>
                </FormGroup>
             </Form>

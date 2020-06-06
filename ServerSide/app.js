@@ -13,13 +13,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
     console.log("Handling " + req.method + '/' + req.path);
-    //res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
     res.header("Access-Control-Allow-Credentials", true);
     res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, OPTIONS, GET");
     res.header("Access-Control-Expose-Headers", "Location");
     res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Headers", "Accept, Accept-Encoding, Accept-Language, Access-Control-Request-Headers, Access-Control-Request-Method, Cache-Control, Connection, Content-Length, Content-Type, Pragma, Host, Origin, Referer, User-Agent");
+
     next();
  });
+
+app.options("/*", function(req, res) {
+    res.status(200).end();
+});
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -32,7 +38,7 @@ app.use(Session.router);
 app.use(function(req, res, next){
     console.log(req.path);
     if(req.session || (req.method === 'POST' &&  
-      (req.path === '/Ssns/login' || req.path === '/Usr/signup'))){
+      (req.path === '/Ssns/login' || req.path === '/Usr/register'))){
         req.validate = new Validate(req, res);
         next();
     }

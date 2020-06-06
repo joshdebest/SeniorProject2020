@@ -92,7 +92,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "POST Usr Tests (Done)",
+			"name": "POST Usr Tests",
 			"item": [
 				{
 					"name": "Admin login",
@@ -1454,7 +1454,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Usr GET (Done)",
+			"name": "Usr GET",
 			"item": [
 				{
 					"name": "GET without login",
@@ -2248,7 +2248,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Ssns POST and GET (Done)",
+			"name": "Ssns POST and GET",
 			"item": [
 				{
 					"name": "Admin login no email",
@@ -2640,7 +2640,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Parent/Student PUT and DELETE",
+			"name": "Parent/Student PUT and DELETE (Usr)",
 			"item": [
 				{
 					"name": "Register Parent LeBron James",
@@ -3777,7 +3777,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "Admin PUT and DELETE",
+			"name": "Admin PUT and DELETE (Usr)",
 			"item": [
 				{
 					"name": "Register Student Kathy",

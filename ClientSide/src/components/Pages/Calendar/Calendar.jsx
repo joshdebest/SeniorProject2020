@@ -3,7 +3,7 @@ import CalendarContainer from './CalendarContainer';
 import './Calendar.css';
 
 const calendar_configuration = {
-  api_key: 'AIzaSyC8yi2Sxhbp_hb-Wq3sPuQeoz8D2CCutaY',
+  api_key: process.env.REACT_APP_GOOGLE_API_KEY,
   calendars: [
     {
       name: 'debest-robotics-calendar',

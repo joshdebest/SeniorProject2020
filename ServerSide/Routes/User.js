@@ -3,9 +3,10 @@ var express = require('express');
 var tags = require('./Validate.js').tags;
 var {Session, router} = require('./Session.js');
 var router = express.Router({caseSensitive: true});
-router.baseURL = '/Usr';
+router.baseURL = '/users';
 
-router.post('/register', function(req, res){
+// Register a new User
+router.post('/', function(req, res){
     var body = req.body;
     var vld = req.validate;
     var sesh;
@@ -36,7 +37,7 @@ router.post('/register', function(req, res){
         },
         function(result, cb){
             sesh = new Session(req.body, res);
-            res.location(router.baseURL + '/signup').status(200).end();
+            res.location('/signup').status(200).end();
             cb();
         }],
         function(err){
@@ -87,46 +88,6 @@ router.put('/:email', function(req, res){
         });
 });
 
-/*     if ("password" in req.body || body.password === "" && body.password === null){
-        validate.errors.push({tag : tags.badValue, params : "password"});
-        validate.res.status(400).json(validate.errors);    
-    }
-                 
-    // checking for oldPwd if non-admin logged in
-    else if (!("password" in req.body) || (("password" in req.body) && ("oldPassword" in req.body) && 
-       req.body.oldPassword !== "") || ssn.isAdmin()){
-
-        validate.errors.push({tag : tags.noOldPassword, params : "old password"});
-        validate.res.status(400).json(validate.errors); 
-    }
-    // checking that non-admin doesn't change role
-    else if (req.body.role && !(ssn.isAdmin())){
-        validate.errors.push({tag: tags.badValue, params: "role"});
-        validate.res.status(400).json(validate.errors); 
-    }
-    else{
-        req.cnn.query('SELECT * from User where email = ?', email, (err, result) => {
-            if(err) throw err;
-            //if((body.password && result[0].password !== body.oldPassword) || (body.password && !(sesh.checkAdmin()))){
-            //if(result[0].password !== body.oldPassword || body.password && !(sesh.checkAdmin())){
-            if(result[0].password !== body.oldPassword && !(ssn.isAdmin())){
-                validate.errors.push({tag : tags.oldPwdIncorrect, params : result[0].password});
-                validate.res.status(400).json(validate.errors); 
-            }
-            else{
-                req.cnn.query('UPDATE User set ? where email = ?', [req.body, email], (err, updated) => {
-                   // req.cnn.release();
-                    if (!err)
-                        res.status(200).end();
-                });
-            }
-        });
-    }
-    req.cnn.release(); 
-}); */
-
-    // ------------------------------------
-
 router.get('/', function(req, res){
     var email = req.query.email;
     if (email){
@@ -148,13 +109,13 @@ router.get('/', function(req, res){
         });
     }
     else if(req.session.isAdmin()){
-        req.cnn.query('select id, email from User;', null, (err, userArray) => {
+        req.cnn.query('select * from User;', null, (err, userArray) => {
             res.json(userArray);
             req.cnn.release();
         });
     }
     else {
-        req.cnn.query('select id, email from User where email = ?;', req.session.email, (err, result) =>{
+        req.cnn.query('select * from User where email = ?;', req.session.email, (err, result) =>{
             if(err) throw err;
             var temp = [];
             result.forEach(function(curr){

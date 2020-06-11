@@ -1,0 +1,32 @@
+.login-container{
+   width: 500px;
+   margin: auto;
+   background: #ffffff;
+   box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2);
+   padding: 40px 40px 45px 40px;
+   transition: all .3s;
+}
+.error{
+   color: red;
+}
+.create-account-link{
+   padding-left: 0px;
+}
+
+.login-wrapper {
+   display: flex;
+   justify-content: center;
+   flex-direction: column;
+   text-align: left;
+ }
+ .login-wrapper h2 {
+   text-align: center;
+   margin: 0;
+   line-height: 1;
+   padding-bottom: 20px;
+ }
+
+ .login-wrapper .form-control:focus {
+   border-color: #167bff;
+   box-shadow: none;
+ }

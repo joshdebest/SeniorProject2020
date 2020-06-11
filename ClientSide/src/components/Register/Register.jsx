@@ -25,9 +25,10 @@ class Register extends Component {
          role: 0
       }
       this.handleChange = this.handleChange.bind(this);
+      this.signup = this.signup.bind(this);
    } 
 
-   submit() {
+   signup(event) {
       let { // Make a copy of the relevant values in current state
          firstName,
          lastName,
@@ -47,6 +48,7 @@ class Register extends Component {
       };
 
       this.props.register(user, () => this.props.history.push('/'));
+      event.preventDefault();
 
    }
 
@@ -80,7 +82,7 @@ class Register extends Component {
    render() {
       console.log("Rendering Register");
       return (
-         <div className="container">
+         <div className="register-container">
             <Col>
                <h1>Register</h1>
             </Col>
@@ -131,8 +133,8 @@ class Register extends Component {
                Passwords don't match
             </Alert> : ''}
          
-         <Button variant="primary" onClick={()=> this.submit()} disabled={!this.validForm()}>
-            Register
+         <Button className="signupbutton" type='submit' onClick={this.signup} disabled={!this.validForm()}>
+            Sign Up
          </Button>
          </div>
       )

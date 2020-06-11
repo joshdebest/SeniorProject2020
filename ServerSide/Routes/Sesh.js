@@ -2,8 +2,9 @@ var express = require('express');
 var async = require('async');
 var tags = require('./Validate.js').tags;
 var {Session, router} = require('./Session.js');
+
 var router = express.Router({caseSensitive: true});
-router.baseURL = '/Ssns';
+router.baseURL = '/ssn';
 
 // get an array of active sessions, must be an admin
 router.get('/', function(req, res){
@@ -37,8 +38,8 @@ router.get('/:cookie', function(req, res){
     req.cnn.release();
 });
 
-// create a new session
-router.post('/login', function(req, res){
+// create a new session and log in the user
+router.post('/', function(req, res){
     var sesh;
     req.cnn.tryQuery('SELECT * from User where email = ?', [req.body.email],
         function(err, result){

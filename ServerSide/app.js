@@ -12,7 +12,7 @@ var app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
-    console.log("Handling " + req.method + '/' + req.path);
+    console.log("Handling " + req.method + req.path);
     res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
     res.header("Access-Control-Allow-Credentials", true);
     res.header("Access-Control-Allow-Methods", "POST, PUT, DELETE, OPTIONS, GET");
@@ -38,7 +38,7 @@ app.use(Session.router);
 app.use(function(req, res, next){
     console.log(req.path);
     if(req.session || (req.method === 'POST' &&  
-      (req.path === '/Ssns/login' || req.path === '/Usr/register'))){
+      (req.path === '/signup' || req.path === '/login'))){
         req.validate = new Validate(req, res);
         next();
     }
@@ -50,8 +50,11 @@ app.use(function(req, res, next){
 app.use(dbCnns.router);
 
 // subroutes
-app.use('/Usr', require('./Routes/User.js'));
-app.use('/Ssns', require('./Routes/Sesh.js'));
+app.use('/users', require('./Routes/User.js'));
+app.use('/signup', require('./Routes/User.js'));
+app.use('/login', require('./Routes/Sesh.js'));
+app.use('/logout', require('./Routes/Sesh.js'));
+app.use('/ssn', require('./Routes/Sesh.js'));
 
 // debugging route used for database DELETE, clears all the tables 
 // and reinserts a single admin user

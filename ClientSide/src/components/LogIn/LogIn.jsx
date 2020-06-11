@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Form, FormGroup, Row, Col, FormControl, Button, Nav} from 'react-bootstrap';
 import {LinkContainer} from 'react-router-bootstrap';
-import Auth from '../../redux/Auth';
+import Register from '../Register/Register';
 import './LogIn.css';
 
 class LogIn extends Component {
@@ -11,20 +11,24 @@ class LogIn extends Component {
       // Current login state
       this.state = {
          email: 'jdebest@email.com',
-         password: 'password',
-         user_token: ''
+         password: 'password'
       }
 
-       // bind 'this' to the correct context
        this.handleChange = this.handleChange.bind(this);
        this.logIn = this.logIn.bind(this);
    } 
 
    // Call redux actionCreator login via props.
    logIn(event) {
-      console.log("Component login with " + this.state.email);
-      this.props.logIn(this.state, () => this.props.history.push('/'));
-      event.preventDefault()
+      // checking for admin login, redirect to admin page
+      if (this.state.email === 'jdebest@email.com'){
+         this.props.logIn(this.state, () => this.props.history.push('/admin'));
+         event.preventDefault();
+      }
+      else{
+         this.props.logIn(this.state, () => this.props.history.push('/'));
+         event.preventDefault()
+      }
    }
 
    closeErrorConf = (btn) => {
@@ -36,13 +40,14 @@ class LogIn extends Component {
       const newState = {}
       newState[event.target.name] = event.target.value;
       this.setState(newState);
-      console.log(newState);
+      console.log("new state: " + newState);
    }
 
    render() {
       console.log("Rendering logIn");
       return (
-         <section className="container">
+         <div className="login-wrapper">
+         <div className="login-container">
             <Col>
                <h1>Log in</h1>
             </Col>
@@ -75,22 +80,32 @@ class LogIn extends Component {
                      />
                   </Col>
                </FormGroup>
+
+               {  
+                 this.props.Users.type === "LOGIN_ERR" ?
+
+                  <FormGroup controlId="formError" className="error">
+                  <Form.Label>Login Error</Form.Label>                     
+                  </FormGroup> : ''
+              }
            
-               <FormGroup >
+               <FormGroup as={Row}>
                   <Col>
                      <Button className="loginbutton" type="submit" onClick={this.logIn}>
                         Sign in
                      </Button>
-                     <LinkContainer to='/register'>
-                        <Nav.Link>Create Account</Nav.Link>
-                     </LinkContainer>
-                 </Col>
+                  </Col>
                </FormGroup>
+                  <Row>
+                     <LinkContainer to='/signup'>
+                        <Nav.Link className="create-account-link">Create Account</Nav.Link>
+                     </LinkContainer>
+                 </Row>
             </Form>
 
-      
-         </section>
-      )
+         </div>
+         </div>
+      );
    }
 }
 

@@ -18,9 +18,9 @@ export default class Footer extends Component {
          <div className='container'>
             <ul className="social_media">
                <li><a href="http://facebook.com"><i className="fab fa-facebook-f"></i></a></li>
-               <li><a href="http://twitter.com"><i className="fab fa-twitter"></i></a></li>
+               <li><a href="https://twitter.com/DebestRobotics"><i className="fab fa-twitter"></i></a></li>
                <li><a href="http://linkedin.com"><i className="fab fa-linkedin"></i></a></li>
-               <li><a href="http://instagram.com"><i className="fab fa-instagram"></i></a></li>
+               <li><a href="https://www.instagram.com/debestrobotics/"><i className="fab fa-instagram"></i></a></li>
             </ul>
          </div>
 

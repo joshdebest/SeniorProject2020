@@ -24,7 +24,7 @@ export default class AboutUs extends Component {
                   <img src={process.env.PUBLIC_URL + '/images/AboutUs2.jpeg'} className='aboutUsImg2'/>
                </Col>
                <Col sm={4}>
-                  <p>We are DeBest Robotics, a program dedicated to
+                  <p>We are DeBest Robotics, an afterschool program dedicated to
                      teaching young students about robotics while emphasizing the 
                      importantance of collaboration and hard work.
                   </p>
@@ -33,8 +33,8 @@ export default class AboutUs extends Component {
 
             <Row className="secondRow">
                <Col sm={4}>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                     Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+                  <p>DeBest robotics compete in tournaments hosted by Vex Robotics. Under strict rules the students will design, program,
+                  and engineer robots to complete unique challenges.  Our teams compete in regional and state tournaments around California.
                   </p>
                </Col>
                <Col sm={8}>

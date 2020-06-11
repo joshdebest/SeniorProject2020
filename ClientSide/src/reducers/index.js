@@ -3,12 +3,12 @@ import { routerReducer } from 'react-router-redux';
 import Users from './Users';
 import Errs from './Errs';
 import Home from './Home';
-import Token from './Token';
+import Admin from './Admin';
 
 const rootReducer = combineReducers({
    Users, 
    Errs, 
    Home,
-   Token
+   Admin
 });
 export default rootReducer;

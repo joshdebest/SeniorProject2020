@@ -23,7 +23,8 @@ function myFetch(method, endpoint, body){
    }).then(response => {
       if (response.ok) {
          return response;
-      } else
+      } 
+      else
          return response.json().then(rsp => Object.values(rsp)
           .map(e => errorTranslate(e.tag)))
           .then(errors => {throw errors});
@@ -52,38 +53,35 @@ export function del(endpoint){
 
 //  Functions for api requests
 
+// THIS LOGIN WORKS
 export function logIn(creds){
    console.log(creds);
-   return post('Ssns/login', creds).then((res) => res.json())
-   .catch(err => []);
+   return post('login', creds)
+   .then(rsp => get('users/' + creds.email))
+      .then(userResponse => userResponse.json())
+      .then(rsp => rsp[0])
+      .catch(err => {console.log('err was this',err);throw err});
 }
 
 export function logOut(){
-   return del('Ssns/' + currSessionCookie).catch(err => {throw err});
+   return del('ssn/' + currSessionCookie).catch(err => {throw err});
 }
-
-/*export function logIn(cred) {
-   return post("Ssns", cred).then(rsp => cred).catch(err => {throw err});
-       .then(response => {
-         let location = response.headers.get("Location").split('/');
-         sessionId = location[location.length - 1];
-         console.log("Got session " + sessionId);
-         return get("Ssns/" + sessionId)
-      })
-      .then(response => response.json())   // ..json() returns a Promise!
-      .then(rsp => get('Prss/' + rsp.prsId))
-      .then(userResponse => userResponse.json())
-      .then(rsp => rsp[0])
-      .catch(err => {console.log('err was this',err);throw err})  
-}*/
 
 /**
  * Register a user
  * @param {Object} User info
  * @returns {Promise resolving to new user registration}
  */
+//export function register(newUser){
+//   return post('signup', newUser).then((res) => res.json()).catch(err => {throw err});
+//}
 export function register(newUser){
-   return post('Usr/register', newUser).then((res) => res.json()).catch(err => {throw err});
+   console.log(newUser);
+   return post('signup', newUser)
+   .then(rsp => get('users/' + newUser.email))
+      .then(userResponse => userResponse.json())
+      .then(rsp => rsp[0])
+      .catch(err => {console.log('err was this',err);throw err});
 }
 
 /**
@@ -91,10 +89,18 @@ export function register(newUser){
  * @returns {Promise} json parsed data
  */
 export function getUser(email) {
-   return get ('Usr/' + email)
+   return get('users/' + email)
    .then(res => res.json())
    .catch(err => {throw err});
 }
+
+export function getUsers() {
+   return get("users")
+   .then((res) => res.json())
+   .catch(err => {console.log('err was this',err);throw err});
+}
+
+
 
 export const errMap = {
    en: {

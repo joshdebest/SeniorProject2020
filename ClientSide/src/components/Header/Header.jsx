@@ -16,10 +16,10 @@ const LoggedOutView = () => {
             <NavDropdown.Item href="/awards">Awards</NavDropdown.Item>
           </NavDropdown>
 
+          <Nav.Item><Nav.Link href="/about">About</Nav.Link></Nav.Item> 
           <Nav.Item><Nav.Link href="/calender">Calender</Nav.Link></Nav.Item> 
-          <Nav.Item><Nav.Link href="/store">Store</Nav.Link></Nav.Item> 
           <Nav.Item><Nav.Link href="/contact">Contact</Nav.Link></Nav.Item>
-          <Nav.Item><Nav.Link href="/login">Log In</Nav.Link></Nav.Item> 
+          <Nav.Item><Nav.Link href="/login">Login</Nav.Link></Nav.Item> 
         </Nav>
 
       </Navbar>
@@ -41,9 +41,9 @@ const LoggedInView = () => {
            </NavDropdown>
  
            <Nav.Item><Nav.Link href="/calender">Calender</Nav.Link></Nav.Item> 
-           <Nav.Item><Nav.Link href="/store">Store</Nav.Link></Nav.Item> 
+           <Nav.Item><Nav.Link href="/resources">Resources</Nav.Link></Nav.Item> 
            <Nav.Item><Nav.Link href="/contact">Contact</Nav.Link></Nav.Item>
-           <Nav.Item><Nav.Link href="/login">Sign Out</Nav.Link></Nav.Item> 
+           <Nav.Item><Nav.Link href="/">Logout</Nav.Link></Nav.Item> 
          </Nav>
  
        </Navbar>
@@ -51,31 +51,10 @@ const LoggedInView = () => {
  };
 
 
-export default function Header ({user_token}) {
- /* constructor(props) {
-    super(props);
-    this.state = {
-       curr_user: (this.props.Users && this.props.Users) || "",
-    }
- }
+export default function Header ({logged_in}) {
 
- componentWillReceiveProps = (nextProps) => {
-  if (nextProps.curr_user) {
-     this.setState(
-      { curr_user: (nextProps.email) || "" })
-  }
-} 
-
-  signedIn() {
-    return Object.keys(this.props.Users).length !== 0; // Nonempty Prss obj
-  }
-
-  render() {
-    console.log("Rendering Header");
-    console.log(this.props.email);
-  }*/
     console.log("Re-rendering Header");
-    console.log(user_token);
+    console.log(logged_in);
     return (
       <nav className="navbar">
         <div className="container">
@@ -88,7 +67,7 @@ export default function Header ({user_token}) {
                className="d-inline-block align-top"/>
           </Link>
 
-          {(user_token) ?
+          {logged_in ?
             <LoggedInView/>
             :
             <LoggedOutView/>

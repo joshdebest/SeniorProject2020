@@ -17,7 +17,7 @@ export default class Contact extends Component {
             </div>
             <h1 style={{paddingTop: '50px', paddingBottom: '50px'}}>Get In Touch</h1>
 
-            <div class="row">
+            <div className="row">
                <Col>
                   <h1 className="contactHeader">The Pegasus School</h1>
                   <p className="contactinfo">19692 Lexington Ln</p>
@@ -37,9 +37,9 @@ export default class Contact extends Component {
                   <div className='container'>
                      <ul className="contactUs_social_media">
                         <li><a href="http://facebook.com"><i className="fab fa-facebook-f"></i></a></li>
-                        <li><a href="http://twitter.com"><i className="fab fa-twitter"></i></a></li>
+                        <li><a href="https://twitter.com/DebestRobotics"><i className="fab fa-twitter"></i></a></li>
                         <li><a href="http://linkedin.com"><i className="fab fa-linkedin"></i></a></li>
-                        <li><a href="http://instagram.com"><i className="fab fa-instagram"></i></a></li>
+                        <li><a href="http://instagram.com/debestrobotics"><i className="fab fa-instagram"></i></a></li>
                      </ul>
                   </div>
                </Col>
